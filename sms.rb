@@ -96,8 +96,24 @@ end
 
 def balance(command)
   puts "got a balance request"
-  @t.say("This is still being implemented.")
+  valuesArray = []
+  lines = File.open("out.csv", "r").readlines.each do |line|
+	line = line.split(/ *, */)
+	valuesArray.push(line[2])
+	end
+	sum = 0
+  valuesArray.each do |value|
+	if value[0] == '('
+		value = value[2..-2]
+		sum = sum - value.to_i
+	else
+		value = value[1..-1]
+		sum = sum + value.to_i
+	end
+  end
+  @t.say("The balance is $#{sum})
 end
+
 
 # Let user know their request wasn't understood.
 def unknownCommand(command)
