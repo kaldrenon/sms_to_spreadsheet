@@ -14,21 +14,21 @@ post '/index.json' do
   # Check the incoming number against a whitelist
   json = File.open("whitelist.json","r").read
   @whitelist = JSON.parse(json)
-  @sender_num = @v[:session][:from][:id]
+  @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
   # Check for sender number in whitelist
-  if(@whitelist.keys.include? @sender_num or @message_text.start_with?("rhok"))
+  if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
     puts "got a valid sender"
     if(@message_text.start_with?("rhok"))
-      @whitelist[@sender_num] = {"name"=>"RHoK Tester","location"=>"Innovation Center"}
+      @whitelist[@sender] = {"name"=>"RHoK Tester","location"=>"Innovation Center"}
       @message_text.slice! /rhok */
     end
 
     performAction(@message_text)
   else
     puts "invalid number!"
-    @t.say("The number you contacted belongs to a Peace Corps project. Your number is not recognized.")
+    #@t.say("The number you contacted belongs to a Peace Corps project. Your number is not recognized.")
   end
 
   puts @message_text
@@ -39,32 +39,43 @@ post '/index.json' do
   return @t.response
 end
 
-def performAction(a)
-  a = a.split(/ *, */)
-  a[0] = a[0].upcase
+def performAction(command)
+  command = command.split(/ *, */)
+  # Force upper case for the command word
+  command[0] = command[0].upcase
+  if(command.size >= 3)
+    # Standardize formatting of amounts
+    command[2].slice! "$"
+    command[2] = "$%.2f" % command[2]
+  end
 
-  case a[0]
-  when "BOUGHT" then buy(a)
-  when "BUY" then buy(a)
-  when "SOLD" then sell(a)
-  when "SELL" then sell(a)
-  when "RECENT" then recent(a)
-  when "PAST" then recent(a)
-  when "BALANCE" then balance(a)
-  when "HELP" then help(a)
-  else unknownCommand(a)
+  case command[0]
+  when "BOUGHT" then buy(command)
+  when "BUY" then buy(command)
+  when "SOLD" then sell(command)
+  when "SELL" then sell(command)
+  when "RECENT" then recent(command)
+  when "PAST" then recent(command)
+  when "BALANCE" then balance(command)
+  when "HELP" then help(command)
+  else unknownCommand(command)
   end
 end
 
 def buy(command)
-  File.open("out.csv", "a") {|f| f.write("bought" + command[1..-1].join(',') + "\n")}
+  puts "doing a buy"
+  File.open("out.csv", "a") {|f| f.write("bought," + command[1..-1].join(',') + "\n")}
+  @t.say("Got your purchase of #{command[1]} for #{command[2]}.")
 end
 
 def sell(command)
-  File.open("out.csv", "a") {|f| f.write("sold" + command[1..-1].join(',') + "\n")}
+  puts "doing a sell"
+  File.open("out.csv", "a") {|f| f.write("sold," + command[1..-1].join(',') + "\n")}
+  @t.say("Got your sale of #{command[1]} for #{command[2]}.")
 end
 
 def recent(command)
+  puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
   lines = lines[-command[1].to_i..-1]
 
@@ -72,10 +83,12 @@ def recent(command)
 end
 
 def balance(command)
-
+  puts "got a balance request"
+  @t.say("This is still being implemented.")
 end
 
 def unknownCommand(command)
+  puts "unknownCommand - #{command.join(",")}"
   @t.say("Sorry, I couldn't understand your message. Please use following syntax: [command] [arguments]\nText HELP for available commands")
 end
 
