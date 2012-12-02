@@ -91,6 +91,7 @@ def recent(command)
     lines = ["You requested too many entries!\n",
       "There are #{lines.length - 1} items in the ledger."]
   end
+  puts lines.join("\n")
   @t.say(lines.join("\n"))
 end
 
