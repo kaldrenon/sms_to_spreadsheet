@@ -28,6 +28,7 @@ post '/index.json' do
     performAction(@message_text)
   else
     puts "invalid number!"
+    @t.say("Your number is not recognized in our approved list.")
   end
 
   puts @message_text
@@ -86,7 +87,7 @@ def recent(command)
   puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
   if (lines.length > command[1].to_i)
-    lines = lines[-command[1].to_i..-1][0..-26]
+    lines = lines[-command[1].to_i..-1]
   else
     lines = ["You requested too many entries!\n",
       "There are #{lines.length - 1} items in the ledger."]
@@ -112,7 +113,7 @@ def balance(command)
       sum = sum + value.to_i
     end
   end
-  puts "The sum is:  #{sum}"
+  puts "The sum is: #{sum}"
 
   @t.say("The balance is $#{sum}")
 end
