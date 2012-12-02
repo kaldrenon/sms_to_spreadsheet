@@ -14,7 +14,9 @@ post '/index.json' do
   puts v[:session][:timestamp]
   puts v[:session][:initial_text]
   puts Time.now
-
+  
+  a.insert(0, Time.now)
+  
   File.open("out.csv", "a") {|f| f.write(a.join(',') + "\n")}
 
   #t.say("We got your purchase!")
