@@ -64,20 +64,28 @@ end
 
 def buy(command)
   puts "doing a buy"
-  File.open("out.csv", "a") {|f| f.write("bought," + command[1..-1].join(',') + "\n")}
-  @t.say("Got your purchase of #{command[1]} for #{command[2]}.")
+  line = "Bought, #{command[1]}, #{command[2]}, #{Time.now}\n"
+  File.open("out.csv", "a") {|f| f.write(line)}
+  @t.say("Got your purchase: #{line}")
 end
 
 def sell(command)
   puts "doing a sell"
-  File.open("out.csv", "a") {|f| f.write("sold," + command[1..-1].join(',') + "\n")}
-  @t.say("Got your sale of #{command[1]} for #{command[2]}.")
+  line = "Sold, #{command[1]} (#{command[2]}), #{Time.now}\n"
+  File.open("out.csv", "a") {|f| f.write(line)}
+  @t.say("Got your sale: #{line}")
 end
 
 def recent(command)
   puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
-  lines = lines[-command[1].to_i..-1]
+  if (lines.length > command[1].to_i)
+    lines = lines[-command[1].to_i..-1]
+  else
+    lines = ["You requested too many entries!\n",
+      "There are #{lines.length - 1} items in the ledger."]
+  end
+
 
   @t.say(lines.join)
 end
