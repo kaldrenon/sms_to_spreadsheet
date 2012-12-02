@@ -37,4 +37,10 @@ Important considerations:
  * strictly enforced syntax is not ideal, users likely non-technical, errors common in SMS
  * Only authorized users should be able to update or receive financial data
 
+## Technology
+
 sms_to_spreadsheet uses [Ruby Sinatra](http://sinatrarb.com) for the server and [Tropo](http://www.tropo.com) as an SMS gateway.
+
+### Deploying
+To deploy, install Ruby 1.9.3, install the sinatra, thin, and tropo-webapi-ruby gems. Clone the repo, navigate into the repo directory, and run `ruby sms.rb -p ####` where #### is the port the server will connect to. Once the server is running, create a Tropo WebAPI application and point it to `http://www.server.address:####/index.json`. Add a phone number to the application, allow a few minutes for the number to sync with the account, and start textingQ
+
