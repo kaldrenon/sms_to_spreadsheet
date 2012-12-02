@@ -38,8 +38,9 @@ post '/index.json' do
   return @t.response
 end
 
+# command: 0 = keyword, 1 = item, 2 = value. For recent, 1 = qty
 def performAction(command)
-  command = command.split(/ *, */)
+  command = command.strip.split(/ *, */)
   # Force upper case for the command word
   command[0] = command[0].upcase
   if(command.size >= 3)
@@ -65,7 +66,7 @@ end
 # Add record of a buy to the CSV
 def buy(command)
   puts "doing a buy"
-  line = "Bought, #{command[1]}, #{command[2]}"
+  line = "Bought, #{command[1]}, (#{command[2]})"
   @t.say("Got your purchase: #{line}")
   line = line + ", #{Time.now}\n"
   File.open("out.csv", "a") {|f| f.write(line)}
@@ -74,7 +75,7 @@ end
 # Add record of a sale to the CSV
 def sell(command)
   puts "doing a sell"
-  line = "Sold, #{command[1]} (#{command[2]})"
+  line = "Sold, #{command[1]}, #{command[2]}"
   @t.say("Got your sale: #{line}")
   line = line + ", #{Time.now}\n"
   File.open("out.csv", "a") {|f| f.write(line)}
@@ -85,13 +86,12 @@ def recent(command)
   puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
   if (lines.length > command[1].to_i)
-    lines = lines[-command[1].to_i..-1]
+    lines = lines[-command[1].to_i..-1][0..-26]
   else
     lines = ["You requested too many entries!\n",
       "There are #{lines.length - 1} items in the ledger."]
   end
-
-  @t.say(lines.join)
+  @t.say(lines.join("\n"))
 end
 
 def balance(command)
@@ -111,9 +111,8 @@ def balance(command)
 		sum = sum + value.to_i
 	end
   end
-  @t.say("The balance is $#{sum})
+  @t.say("The balance is $#{sum})")
 end
-
 
 # Let user know their request wasn't understood.
 def unknownCommand(command)
