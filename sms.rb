@@ -28,7 +28,6 @@ post '/index.json' do
     performAction(@message_text)
   else
     puts "invalid number!"
-    #@t.say("The number you contacted belongs to a Peace Corps project. Your number is not recognized.")
   end
 
   puts @message_text
@@ -49,6 +48,7 @@ def performAction(command)
     command[2] = "$%.2f" % command[2]
   end
 
+  # Execute the appropriate command based on the first word in the message
   case command[0]
   when "BOUGHT" then buy(command)
   when "BUY" then buy(command)
@@ -62,20 +62,25 @@ def performAction(command)
   end
 end
 
+# Add record of a buy to the CSV
 def buy(command)
   puts "doing a buy"
-  line = "Bought, #{command[1]}, #{command[2]}, #{Time.now}\n"
-  File.open("out.csv", "a") {|f| f.write(line)}
+  line = "Bought, #{command[1]}, #{command[2]}"
   @t.say("Got your purchase: #{line}")
+  line = line + ", #{Time.now}\n"
+  File.open("out.csv", "a") {|f| f.write(line)}
 end
 
+# Add record of a sale to the CSV
 def sell(command)
   puts "doing a sell"
-  line = "Sold, #{command[1]} (#{command[2]}), #{Time.now}\n"
-  File.open("out.csv", "a") {|f| f.write(line)}
+  line = "Sold, #{command[1]} (#{command[2]})"
   @t.say("Got your sale: #{line}")
+  line = line + ", #{Time.now}\n"
+  File.open("out.csv", "a") {|f| f.write(line)}
 end
 
+# Show the user the N most recent transactions
 def recent(command)
   puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
@@ -86,7 +91,6 @@ def recent(command)
       "There are #{lines.length - 1} items in the ledger."]
   end
 
-
   @t.say(lines.join)
 end
 
@@ -95,11 +99,13 @@ def balance(command)
   @t.say("This is still being implemented.")
 end
 
+# Let user know their request wasn't understood.
 def unknownCommand(command)
   puts "unknownCommand - #{command.join(",")}"
   @t.say("Sorry, I couldn't understand your message. Please use following syntax: [command] [arguments]\nText HELP for available commands")
 end
 
+# Show user a help message
 def help(command)
   puts "running help function"
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
