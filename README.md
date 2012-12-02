@@ -37,4 +37,4 @@ Important considerations:
  * strictly enforced syntax is not ideal, users likely non-technical, errors common in SMS
  * Only authorized users should be able to update or receive financial data
 
-sms_to_spreadsheet uses Ruby Sinatra for the server and Tropo as an SMS gateway.
+sms_to_spreadsheet uses [Ruby Sinatra](http://sinatrarb.com) for the server and [Tropo](http://www.tropo.com) as an SMS gateway.
