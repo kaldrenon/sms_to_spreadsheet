@@ -1,21 +1,4 @@
-test,test,test
-test,2,google
-
-test
-
-Bought,pencils,$10.00
-Bought,Water Buffalo,Free
-Bought,tree,3.50
-bought,google,50000000
-test,google,test
-test
-test
-bought,boat,$350
-2012-12-02 12:14:21 -0500,I am invalid 
-2012-12-02 12:23:59 -0500,rhok
-2012-12-02 12:24:33 -0500,Now I am valid!
-2012-12-02 12:29:04 -0500,rhok
-2012-12-02 12:46:05 -0500,this is a test
-2012-12-02 12:52:59 -0500,This is the test 
-2012-12-02 12:56:49 -0500,and then click publish,and a hockey game. I would love to see the full article. The first thing you should be able too. I don't know how much I'll 
-2012-12-02 12:56:49 -0500,f course,the more I think I just got here. I am out with a friend of the people of importance
+Action,Item,Value,Timestamp
+Bought, things, ($10.00), 2012-12-02 15:47:15 -0500
+Sold, nothing, $50.00, 2012-12-02 15:51:41 -0500
+Bought, tree, ($3.00), 2012-12-02 15:54:12 -0500
