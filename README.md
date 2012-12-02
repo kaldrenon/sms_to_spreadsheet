@@ -9,6 +9,19 @@ In its current form, it is able to receive text messages, split and clean up ext
 
 It also uses a whitelist file (whitelist.json) to limit influence over the spreadsheet to users who are approved.
 
+## Using SMS to Spreadsheet
+When the application is running, simply send a text message to the designated number.
+
+Our current testing number is 585-326-0597.
+
+The following commands can be used:
+
+ * Buy: send a message formatted like `buy, item, amt` where `item` is what you bought and `amt` is the price you paid
+ * Sell: send a message formatted like `sell, item, amt` where `item` is what you bought and `amt` is the amount you were given
+ * Recent: send `recent, #` where `#` is the number of recent ledger entries you'd like to be sent.
+ * Help: send `help` to be sent a reminder of the commands that can be used
+ * Balance: *NOT YET IMPLEMENTED*, a planned feature is to notify the sender of the amounts spent and received within some time frame, as well as the available budget.
+
 
 ## Design
 
