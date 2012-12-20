@@ -2,6 +2,7 @@
 require 'sinatra'
 require 'rubygems'
 require 'tropo-webapi-ruby'
+require 'pony'
 
 use Rack::Session::Pool
 
@@ -17,6 +18,8 @@ post '/index.json' do
   @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
+  File.open("numbers","a") {|f| f.write(@sender + "\n")}
+
   # Check for sender number in whitelist
   if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
     puts "got a valid sender"
@@ -31,7 +34,8 @@ post '/index.json' do
     @t.say("Your number is not recognized in our approved list.")
   end
 
-  puts @message_text
+  puts "From: #{@sender}"
+  puts "Body: #{@message_text}"
 
   # Write the line to a CSV
   File.open("test.csv", "a") {|f| f.write(@message_text + "\n")}
@@ -128,5 +132,26 @@ end
 def help(command)
   puts "running help function"
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
+end
+
+get '/email' do
+  erb :email_request, :locals => {:sent => false}
+end
+
+post '/email' do
+  name = params[:name]
+  email = params[:email]
+  puts params
+
+  attachment = "out.csv"
+  Pony.mail(
+    :to => "#{name} <#{email}>",
+    :from => 'SMS to Spreadsheet <noreply@kaldrenon.com>',
+    :subject => name + ", here is the email you requested from S2S.",
+    :html_body => "See attachment.",
+    :attachments => {File.basename("#{attachment}") => File.read("#{attachment}")}
+  )
+  puts name + ", " + email
+  erb :email_request, :locals => {:sent => true, :name => name, :email => email}
 end
 
