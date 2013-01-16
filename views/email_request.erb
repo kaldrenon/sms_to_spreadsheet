@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>Request a CSV</title>
+    <link type="text/css" href="/css/style.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <h3 class="pagetitle">Request a CSV</h3>
+    <% if sent and post %>
+      <%= "<p>Email was sent to " + name + " at " + email + "!</p>" %>
+    <% elsif post %>
+      <%= "<p>Email not sent - the email addess you provided (#{email}) is not known!</p>" %>
+    <% end %>
+    <form id="email_form" method="post" action="/email">
+      <table>
+        <tr>
+          <td>
+            <label for="number">Number:</label>
+          </td>
+          <td>
+            <input name="number" id="number" type="TEXT" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="email">E-mail:</label>
+          </td>
+          <td>
+            <input name="email" id="email" type="TEXT" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="SUBMIT" id="submit" value="Submit">
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
+
+<script>
+  $.post("/email", $(".email_form").serialize(), function(result){
+    $.html(result)
+  });
+</script>

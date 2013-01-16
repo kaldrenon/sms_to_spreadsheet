@@ -134,24 +134,58 @@ def help(command)
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
 end
 
+
+get '/' do
+  erb :index
+end
+
 get '/email' do
-  erb :email_request, :locals => {:sent => false}
+  erb :email_request, :locals => {:sent => false, :post => false}
 end
 
 post '/email' do
-  name = params[:name]
+  number = params[:number]
   email = params[:email]
+  
   puts params
 
-  attachment = "out.csv"
-  Pony.mail(
-    :to => "#{name} <#{email}>",
-    :from => 'SMS to Spreadsheet <noreply@kaldrenon.com>',
-    :subject => name + ", here is the email you requested from S2S.",
-    :html_body => "See attachment.",
-    :attachments => {File.basename("#{attachment}") => File.read("#{attachment}")}
-  )
-  puts name + ", " + email
-  erb :email_request, :locals => {:sent => true, :name => name, :email => email}
+  #TODO: Check email address against a whitelist
+  json = File.open("whitelist.json","r").read
+  @whitelist = JSON.parse(json)
+  puts @whitelist
+
+  post = false
+  if (@whitelist[number]["email"]) and (@whitelist[number]["email"] == email)
+    attachment = "out.csv"
+    Pony.mail(
+      :to => "#{@whitelist[number]["name"]} <#{email}>",
+      :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
+      :subject => @whitelist[number]["name"] + ", here is the email you requested from S2S.",
+      :html_body => "See attachment.",
+      :attachments => {File.basename("#{attachment}") => File.read("#{attachment}")}
+    )
+    post = true
+  end
+
+
+  erb :email_request, :locals => {
+    :sent => true, 
+    :post => post, 
+    :number => number, 
+    :email => email,
+    :name => @whitelist[number]["name"]
+  }
+end
+
+get '/register' do
+  erb :register, :locals => { :post => false }
+end
+
+post '/register' do
+  name = params[:name]
+  email = params[:email]
+  number = params[:number]
+
+  erb :register, :locals => { :post => true }
 end
 

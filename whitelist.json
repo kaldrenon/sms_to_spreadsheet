@@ -1,18 +1,20 @@
 {
   "12675662387" : {
-    "name":"Andrew",
-    "location":"Rochester, NY"
+    "name":"Andrew Fallows",
+    "location":"Rochester, NY",
+    "email":"kaldrenon@gmail.com"
   },
   "12157037605" : {
-    "name":"Andrew",
+    "name":"Andrew Fallows",
+    "email":"a.s.fallows@gmail.com",
     "location":"Rochester, NY"
   },
   "15189826860" : {
-    "name":"Caleb",
+    "name":"Caleb Coffie",
     "location":"Rochester, NY"
   },
   "15189521049" : {
-    "name":"Caleb",
+    "name":"Caleb Coffie",
     "location":"Rochester, NY"
   }
 }
