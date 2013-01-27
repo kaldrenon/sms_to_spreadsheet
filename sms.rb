@@ -149,7 +149,6 @@ post '/email' do
   
   puts params
 
-  #TODO: Check email address against a whitelist
   json = File.open("whitelist.json","r").read
   @whitelist = JSON.parse(json)
   puts @whitelist
@@ -185,6 +184,13 @@ post '/register' do
   name = params[:name]
   email = params[:email]
   number = params[:number]
+
+  json = JSON.parse(File.open("applications.json","r").read)
+  json[number] = {"name" => name, "email" => email}
+
+  File.open("applications.json","w") do |f|
+    f.write(JSON.pretty_generate(json))
+  end
 
   erb :register, :locals => { :post => true }
 end
