@@ -1,17 +1,17 @@
 body {
   font-family: sans-serif;
-  background: #efefef;
+  background: #146;
   margin-left: 20%;
   margin-right: 20%;
   margin-top: 5%;
 }
 a {
   text-decoration: none;
-  color: #0033ff;
+  color: #146;
 }
 a:hover{
   text-decoration: underline;
-  color: #000066
+  color: #024;
 }
 table {
   margin-left: auto;
@@ -27,4 +27,24 @@ td.index:hover {
 }
 .pagetitle {
   text-align: center;
+}
+
+div.mainbody{
+  position: relative;
+  background-color: #eee;
+  padding: 10px;
+  margin-right: auto;
+  margin-left: auto;
+  border: 2px solid #aaa;         
+  border-top-right-radius: 8px;   
+  border-top-left-radius: 8px;    
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px; 
+}
+
+div#floater {
+  height: 50%;
+  width: 80%;
+  margin-right: auto;
+  margin-left: auto;
 }

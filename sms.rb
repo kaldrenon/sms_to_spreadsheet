@@ -64,6 +64,7 @@ def performAction(command)
   when "PAST" then recent(command)
   when "BALANCE" then balance(command)
   when "HELP" then help(command)
+  when "REGISTER" then register(command)
   else unknownCommand(command)
   end
 end
@@ -134,6 +135,25 @@ def help(command)
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
 end
 
+def register(command)
+  puts "register function"
+  args = command.split(" ")[1..-1]
+  params = { :name => args[0], :number => args[1], :email => args[2] }
+  add_application(params)
+end
+
+def add_application(params)
+  name = params[:name]
+  email = params[:email]
+  number = params[:number]
+
+  json = JSON.parse(File.open("applications.json","r").read)
+  json[number] = {"name" => name, "email" => email}
+
+  File.open("applications.json","w") do |f|
+    f.write(JSON.pretty_generate(json))
+  end
+end
 
 get '/' do
   erb :index
@@ -181,17 +201,7 @@ get '/register' do
 end
 
 post '/register' do
-  name = params[:name]
-  email = params[:email]
-  number = params[:number]
-
-  json = JSON.parse(File.open("applications.json","r").read)
-  json[number] = {"name" => name, "email" => email}
-
-  File.open("applications.json","w") do |f|
-    f.write(JSON.pretty_generate(json))
-  end
-
+  add_application(params)
   erb :register, :locals => { :post => true }
 end
 
