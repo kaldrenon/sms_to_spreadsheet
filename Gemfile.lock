@@ -1,6 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    bson (1.8.2)
+    bson_ext (1.8.2)
+      bson (~> 1.8.2)
     daemons (1.1.9)
     eventmachine (1.0.0)
     hashie (2.0.0)
@@ -11,6 +14,8 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.21)
+    mongo (1.8.2)
+      bson (~> 1.8.2)
     polyglot (0.3.3)
     pony (1.4)
       mail (> 2.0)
@@ -37,6 +42,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bson_ext
+  mongo
   pony
   sinatra
   thin
