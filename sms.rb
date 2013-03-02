@@ -3,48 +3,60 @@ require 'sinatra'
 require 'rubygems'
 require 'tropo-webapi-ruby'
 require 'pony'
+require 'mongo'
+
+### Mongo includes
+include Mongo
+
+@@mongo = MongoClient.new('localhost',27017)
+# These are documents in the Mongo DB
+@@apps = @@mongo['local']['applications']
+@@white = @@mongo['local']['whitelist']
+@@ledgers = @@mongo['local']['ledgers']
 
 use Rack::Session::Pool
 
 post '/index.json' do
-
   # Receive a text message from an external device
   @v = Tropo::Generator.parse request.env["rack.input"].read
   @t = Tropo::Generator.new
 
   # Check the incoming number against a whitelist
-  json = File.open("whitelist.json","r").read
-  @whitelist = JSON.parse(json)
+  # TODO : Replace with Mongo check
+  #json = File.open("whitelist.json","r").read
+  #@whitelist = JSON.parse(json)
+  
   @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
-  File.open("numbers","a") {|f| f.write(@sender + "\n")}
-
   # Check for sender number in whitelist
-  if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
+  #if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
+  if (@@white.find("number" => @sender) or @message_text.start_with?("rhok"))
     puts "got a valid sender"
-    if(@message_text.start_with?("rhok"))
-      @whitelist[@sender] = {"name"=>"RHoK Tester","location"=>"Innovation Center"}
-      @message_text.slice! /rhok */
-    end
 
-    performAction(@message_text)
+    @ledger = @@white.find("number" => @sender).first['ledger']
+
+    performAction(@message_text, @ledger)
   else
     puts "invalid number!"
     @t.say("Your number is not recognized in our approved list.")
   end
 
+  # Console output
   puts "From: #{@sender}"
   puts "Body: #{@message_text}"
 
   # Write the line to a CSV
-  File.open("test.csv", "a") {|f| f.write(@message_text + "\n")}
+  # TODO: Replace with Mongo update
+  #File.open("test.csv", "a") {|f| f.write(@message_text + "\n")}
+  @@mongo['local']['message_dump'].insert(@message_text)
 
   return @t.response
 end
 
 # command: 0 = keyword, 1 = item, 2 = value. For recent, 1 = qty
-def performAction(command)
+# TODO: Make this more robust for commands of varying length
+def performAction(command, ledger)
   command = command.strip.split(/ *, */)
   # Force upper case for the command word
   command[0] = command[0].upcase
@@ -69,7 +81,7 @@ def performAction(command)
   end
 end
 
-# Add record of a buy to the CSV
+### Add record of a buy to the CSV
 def buy(command)
   puts "doing a buy"
   line = "Bought, #{command[1]}, (#{command[2]})"
@@ -78,7 +90,7 @@ def buy(command)
   File.open("out.csv", "a") {|f| f.write(line)}
 end
 
-# Add record of a sale to the CSV
+### Add record of a sale to the CSV
 def sell(command)
   puts "doing a sell"
   line = "Sold, #{command[1]}, #{command[2]}"
@@ -87,7 +99,7 @@ def sell(command)
   File.open("out.csv", "a") {|f| f.write(line)}
 end
 
-# Show the user the N most recent transactions
+### Show the user the N most recent transactions
 def recent(command)
   puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
@@ -101,6 +113,7 @@ def recent(command)
   @t.say(lines.join("\n"))
 end
 
+### Calculate the balance based on sum/difference of all ledger entries
 def balance(command)
   puts "got a balance request"
   valuesArray = []
@@ -123,18 +136,19 @@ def balance(command)
   @t.say("The balance is $#{sum}")
 end
 
-# Let user know their request wasn't understood.
+### Let user know their request wasn't understood.
 def unknownCommand(command)
   puts "unknownCommand - #{command.join(",")}"
   @t.say("Sorry, I couldn't understand your message. Please use following syntax: [command] [arguments]\nText HELP for available commands")
 end
 
-# Show user a help message
+### Show user a help message
 def help(command)
   puts "running help function"
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
 end
 
+### TODO: Let a user register via SMS
 def register(command)
   puts "register function"
   args = command.split(" ")[1..-1]
@@ -153,16 +167,21 @@ def add_application(params)
   File.open("applications.json","w") do |f|
     f.write(JSON.pretty_generate(json))
   end
+
+  #TODO: Email admin about a new request
 end
 
+### Show an index page (explains the purpose of the app)
 get '/' do
   erb :index
 end
 
+### Show a form letting a user request an emailed CSV
 get '/email' do
   erb :email_request, :locals => {:sent => false, :post => false}
 end
 
+### If the input was valid, send the user the CSV they requested
 post '/email' do
   number = params[:number]
   email = params[:email]
@@ -196,12 +215,26 @@ post '/email' do
   }
 end
 
+### Show a form for registering in the system
 get '/register' do
   erb :register, :locals => { :post => false }
 end
 
+### Create an application for the admin to approve
 post '/register' do
   add_application(params)
   erb :register, :locals => { :post => true }
 end
 
+get '/mongo/:number' do
+  n = params[:number]
+  ln = @@white.find("number" => n).first['ledger']
+
+  l = @@ledgers.find("name" => ln).first
+
+  l['entries'].each do |entry|
+    puts entry['timestamp']
+  end
+
+  return "done"
+end
