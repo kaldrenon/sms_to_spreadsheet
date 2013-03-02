@@ -8,11 +8,13 @@ require 'mongo'
 ### Mongo includes
 include Mongo
 
-@@mongo = MongoClient.new('localhost',27017)
+c = JSON.parse(File.open("config.json","r").read)
+ENV['MONGODB_URI'] = c['db']['uri']
+@@mongo = MongoClient.new
 # These are documents in the Mongo DB
-@@apps = @@mongo['local']['applications']
-@@white = @@mongo['local']['whitelist']
-@@ledgers = @@mongo['local']['ledgers']
+@@apps = @@mongo['pcsms']['applications']
+@@white = @@mongo['pcsms']['whitelist']
+@@ledgers = @@mongo['pcsms']['ledgers']
 
 use Rack::Session::Pool
 
@@ -228,12 +230,17 @@ end
 
 get '/mongo/:number' do
   n = params[:number]
-  ln = @@white.find("number" => n).first['ledger']
+  results = @@white.find("number" => n)
+  if(results.count > 0)
+    ln = results.first['ledger']
+  end
 
-  l = @@ledgers.find("name" => ln).first
-
-  l['entries'].each do |entry|
-    puts entry['timestamp']
+  results = @@ledgers.find("name" => ln)
+  if(results.count > 0)
+    l = results.first
+    l['entries'].each do |entry|
+      puts entry['timestamp']
+    end
   end
 
   return "done"

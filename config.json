@@ -1,0 +1,5 @@
+{
+   "db": {
+     "uri":"mongodb://pcsms:RHOK12@ds031117.mongolab.com:31117/pcsms"
+   }
+}
