@@ -33,7 +33,7 @@ post '/index.json' do
 
   # Check for sender number in whitelist
   #if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
-  if (@@white.find("number" => @sender) or @message_text.start_with?("rhok"))
+  if (@@white.find("number" => @sender))
     puts "got a valid sender"
 
     @ledger = @@white.find("number" => @sender).first['ledger']
