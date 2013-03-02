@@ -51,7 +51,7 @@ post '/index.json' do
   # Write the line to a CSV
   # TODO: Replace with Mongo update
   #File.open("test.csv", "a") {|f| f.write(@message_text + "\n")}
-  @@mongo['pcsms']['message_dump'].insert("message" : @message_text)
+  @@mongo['pcsms']['message_dump'].insert("message" => @message_text)
 
   return @t.response
 end
