@@ -23,16 +23,11 @@ post '/index.json' do
   @v = Tropo::Generator.parse request.env["rack.input"].read
   @t = Tropo::Generator.new
 
-  # Check the incoming number against a whitelist
-  # TODO : Replace with Mongo check
-  #json = File.open("whitelist.json","r").read
-  #@whitelist = JSON.parse(json)
-  
+  # Pull important values out of the Tropo-generated JSON blob
   @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
   # Check for sender number in whitelist
-  #if(@whitelist.keys.include? @sender or @message_text.start_with?("rhok"))
   if (@@white.find("number" => @sender))
     puts "got a valid sender"
 
@@ -48,15 +43,13 @@ post '/index.json' do
   puts "From: #{@sender}"
   puts "Body: #{@message_text}"
 
-  # Write the line to a CSV
-  # TODO: Replace with Mongo update
-  #File.open("test.csv", "a") {|f| f.write(@message_text + "\n")}
+  # Write the message to a document in mongo
   @@mongo['pcsms']['message_dump'].insert("message" => @message_text)
 
   return @t.response
 end
 
-# command: 0 = keyword, 1 = item, 2 = value. For recent, 1 = qty
+# Currently - command: 0 = keyword, 1 = item, 2 = value. For recent, 1 = qty
 # TODO: Make this more robust for commands of varying length
 def performAction(command, ledger)
   command = command.strip.split(/ *, */)
@@ -89,7 +82,8 @@ def buy(command)
   line = "Bought, #{command[1]}, (#{command[2]})"
   @t.say("Got your purchase: #{line}")
   line = line + ", #{Time.now}\n"
-  File.open("out.csv", "a") {|f| f.write(line)}
+  # TODO: Update correct ledger document
+  #File.open("out.csv", "a") {|f| f.write(line)}
 end
 
 ### Add record of a sale to the CSV
@@ -98,7 +92,8 @@ def sell(command)
   line = "Sold, #{command[1]}, #{command[2]}"
   @t.say("Got your sale: #{line}")
   line = line + ", #{Time.now}\n"
-  File.open("out.csv", "a") {|f| f.write(line)}
+  # TODO: Update correct ledger document
+  #File.open("out.csv", "a") {|f| f.write(line)}
 end
 
 ### Show the user the N most recent transactions
@@ -166,9 +161,10 @@ def add_application(params)
   json = JSON.parse(File.open("applications.json","r").read)
   json[number] = {"name" => name, "email" => email}
 
-  File.open("applications.json","w") do |f|
-    f.write(JSON.pretty_generate(json))
-  end
+  # TODO: Update Mongo applications document
+  #File.open("applications.json","w") do |f|
+  #  f.write(JSON.pretty_generate(json))
+  #end
 
   #TODO: Email admin about a new request
 end
