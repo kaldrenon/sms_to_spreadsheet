@@ -27,21 +27,18 @@ post '/index.json' do
   @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
+  # Initialize important instance variables
+  # sender number (the unique identifier)
+
   # Check for sender number in whitelist
   if (@@white.find("number" => @sender))
-    puts "got a valid sender"
-
+    # Find this user's ledger.
     @ledger = @@white.find("number" => @sender).first['ledger']
 
     performAction(@message_text, @ledger)
   else
-    puts "invalid number!"
     @t.say("Your number is not recognized in our approved list.")
   end
-
-  # Console output
-  puts "From: #{@sender}"
-  puts "Body: #{@message_text}"
 
   # Write the message to a document in mongo
   @@mongo['pcsms']['message_dump'].insert("message" => @message_text)
@@ -78,7 +75,6 @@ end
 
 ### Add record of a buy to the CSV
 def buy(command)
-  puts "doing a buy"
   line = "Bought, #{command[1]}, (#{command[2]})"
   @t.say("Got your purchase: #{line}")
   line = line + ", #{Time.now}\n"
@@ -88,7 +84,6 @@ end
 
 ### Add record of a sale to the CSV
 def sell(command)
-  puts "doing a sell"
   line = "Sold, #{command[1]}, #{command[2]}"
   @t.say("Got your sale: #{line}")
   line = line + ", #{Time.now}\n"
@@ -98,7 +93,6 @@ end
 
 ### Show the user the N most recent transactions
 def recent(command)
-  puts "replying with recent"
   lines = File.open("out.csv", "r").readlines
   if (lines.length > command[1].to_i)
     lines = lines[-command[1].to_i..-1]
@@ -106,13 +100,11 @@ def recent(command)
     lines = ["You requested too many entries!\n",
       "There are #{lines.length - 1} items in the ledger."]
   end
-  puts lines.join("\n")
   @t.say(lines.join("\n"))
 end
 
 ### Calculate the balance based on sum/difference of all ledger entries
 def balance(command)
-  puts "got a balance request"
   valuesArray = []
   lines = File.open("out.csv", "r").readlines.each do |line|
     line = line.split(/ *, */)
@@ -128,26 +120,22 @@ def balance(command)
       sum = sum + value.to_i
     end
   end
-  puts "The sum is: #{sum}"
 
   @t.say("The balance is $#{sum}")
 end
 
 ### Let user know their request wasn't understood.
 def unknownCommand(command)
-  puts "unknownCommand - #{command.join(",")}"
   @t.say("Sorry, I couldn't understand your message. Please use following syntax: [command] [arguments]\nText HELP for available commands")
 end
 
 ### Show user a help message
 def help(command)
-  puts "running help function"
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
 end
 
 ### TODO: Let a user register via SMS
 def register(command)
-  puts "register function"
   args = command.split(" ")[1..-1]
   params = { :name => args[0], :number => args[1], :email => args[2] }
   add_application(params)
@@ -184,11 +172,8 @@ post '/email' do
   number = params[:number]
   email = params[:email]
   
-  puts params
-
   json = File.open("whitelist.json","r").read
   @whitelist = JSON.parse(json)
-  puts @whitelist
 
   post = false
   if (@whitelist[number]["email"]) and (@whitelist[number]["email"] == email)
@@ -202,7 +187,6 @@ post '/email' do
     )
     post = true
   end
-
 
   erb :email_request, :locals => {
     :sent => true, 
@@ -224,20 +208,3 @@ post '/register' do
   erb :register, :locals => { :post => true }
 end
 
-get '/mongo/:number' do
-  n = params[:number]
-  results = @@white.find("number" => n)
-  if(results.count > 0)
-    ln = results.first['ledger']
-  end
-
-  results = @@ledgers.find("name" => ln)
-  if(results.count > 0)
-    l = results.first
-    l['entries'].each do |entry|
-      puts entry['timestamp']
-    end
-  end
-
-  return "done"
-end
