@@ -209,7 +209,7 @@ end
 post '/email' do
   number = params[:number]
   email = params[:email]
-  
+
   post = false
   sender_info = @@white.find("number" => @sender)
   if(sender_info.count == 1)
@@ -217,7 +217,7 @@ post '/email' do
     ledger_name = @@ledgers.find("owner" => sender_info['number']).first['title']
     if(sender_info['email'] == email)
       attachment = "#{ledger_name}.csv"
-      
+
       csv_body = build_csv
 
       Pony.mail(
@@ -231,24 +231,25 @@ post '/email' do
     else
       #TODO: respond to mismatch in number and email
     end
-
-    erb :email_request, :locals => {
-      :sent => true, 
-      :post => post, 
-      :number => number, 
-      :email => email,
-      :name => @whitelist[number]["name"]
-    }
   end
 
-  ### Show a form for registering in the system
-  get '/register' do
-    erb :register, :locals => { :post => false }
-  end
+  erb :email_request, :locals => {
+    :sent => true, 
+    :post => post, 
+    :number => number, 
+    :email => email,
+    :name => @whitelist[number]["name"]
+  }
+end
 
-  ### Create an application for the admin to approve
-  post '/register' do
-    add_application(params)
-    erb :register, :locals => { :post => true }
-  end
+### Show a form for registering in the system
+get '/register' do
+  erb :register, :locals => { :post => false }
+end
+
+### Create an application for the admin to approve
+post '/register' do
+  add_application(params)
+  erb :register, :locals => { :post => true }
+end
 
