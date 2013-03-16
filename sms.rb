@@ -183,19 +183,17 @@ def add_application(params)
   name = params[:name]
   email = params[:email]
   number = params[:number]
-
-  json = JSON.parse(File.open("applications.json","r").read)
-  json[number] = {"name" => name, "email" => email}
+  ledger = params[:ledger]
 
   # TODO: Update Mongo applications document
-  @@apps.insert({"name" => name, "email" => email, "number" => number})
+  @@apps.insert({"name" => name, "email" => email, "number" => number, "ledger" => ledger})
 
   #TODO: Email admin about a new request
   Pony.mail(
     :to => c['admin']
     :from => "csv_sender@pcsms.herokuapp.com",
     :subject => "New Applicant on PCSMS - #{name}",
-    :html_body => '<a href="http://pcsms.herokuapp.com">Click here!</a>'
+    :html_body => "<a href=\"http://pcsms.herokuapp.com\">Click here!</a>"
   )
 end
 
