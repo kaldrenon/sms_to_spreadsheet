@@ -112,16 +112,22 @@ def ledger_push(action, value, description, timestamp)
 end
 
 ### Show the user the N most recent transactions
-def recent(command)
-  # TODO: Replace file operations with db operations
-  lines = File.open("out.csv", "r").readlines
-  if (lines.length > command[1].to_i)
-    lines = lines[-command[1].to_i..-1]
-  else
-    lines = ["You requested too many entries!\n",
-      "There are #{lines.length - 1} items in the ledger."]
+def recent
+  num_recent = 5
+  entries = @@ledgers.find("owner" => @sender).first['entries']
+
+  if(entries.length < num_recent)
+    num_recent = entries.length
   end
-  @t.say(lines.join("\n"))
+
+  reply = []
+  
+  for n in 1..num_recent
+    entry = entries[-n]
+    reply.push("#{entry['action']}, #{entry['description']}, #{entry['value']}")
+  end
+
+  @t.say(reply.join("\n"))
 end
 
 ### Calculate the balance based on sum/difference of all ledger entries
