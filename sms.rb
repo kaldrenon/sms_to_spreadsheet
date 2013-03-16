@@ -240,7 +240,7 @@ post '/email' do
       return "<h3>failed</h3>"
     end
   else
-    return "#{@@white.find("number" => @sender)}"
+    return "#{@@white.find("number" => @sender).to_s}"
   end
 
 end
