@@ -29,7 +29,7 @@ post '/index.json' do
   @message_text = @v[:session][:initial_text]
 
   # Check for sender number in whitelist
-  if (@@white.find("number" => @sender))
+  if (@@white.find("number" => @sender).count == 1)
     # Find this user's ledger.
     @ledger = @@white.find("number" => @sender).first['ledger']
 
@@ -182,6 +182,20 @@ def add_application(params)
   #TODO: Email admin about a new request
 end
 
+def build_csv
+  ledger = @@ledgers.find("owner" => @sender).first
+  entries = ledger['entries']
+
+  body = [ledger['title']]
+
+  entries.each do |entry|
+    body.push("#{entry['action']},#{entry['description']},
+               #{entry['value']},#{entry'timestamp']}")
+  end
+
+  return body
+end
+
 ### Show an index page (explains the purpose of the app)
 get '/' do
   erb :index
@@ -197,39 +211,45 @@ post '/email' do
   number = params[:number]
   email = params[:email]
   
-  json = File.open("whitelist.json","r").read
-  @whitelist = JSON.parse(json)
-
   post = false
-  if (@whitelist[number]["email"]) and (@whitelist[number]["email"] == email)
-    attachment = "out.csv"
-    Pony.mail(
-      :to => "#{@whitelist[number]["name"]} <#{email}>",
-      :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
-      :subject => @whitelist[number]["name"] + ", here is the email you requested from S2S.",
-      :html_body => "See attachment.",
-      :attachments => {File.basename("#{attachment}") => File.read("#{attachment}")}
-    )
-    post = true
+  sender_info = @@white.find("number" => @sender)
+  if(sender_info.count == 1)
+    sender_info = sender_info.first
+    ledger_name = @@ledgers.find("owner" => sender_info['number']).first['title']
+    if(sender_info['email'] == email)
+      attachment = "#{ledger_name}.csv"
+      
+      csv_body = build_csv
+
+      Pony.mail(
+        :to => "#{@whitelist[number]["name"]} <#{email}>",
+        :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
+        :subject => @whitelist[number]["name"] + ", here is the email you requested from S2S.",
+        :html_body => "See attachment.",
+        :attachments => {File.basename("#{attachment}") => csv_body}
+      )
+      post = true
+    else
+      #TODO: respond to mismatch in number and email
+    end
+
+    erb :email_request, :locals => {
+      :sent => true, 
+      :post => post, 
+      :number => number, 
+      :email => email,
+      :name => @whitelist[number]["name"]
+    }
   end
 
-  erb :email_request, :locals => {
-    :sent => true, 
-    :post => post, 
-    :number => number, 
-    :email => email,
-    :name => @whitelist[number]["name"]
-  }
-end
+  ### Show a form for registering in the system
+  get '/register' do
+    erb :register, :locals => { :post => false }
+  end
 
-### Show a form for registering in the system
-get '/register' do
-  erb :register, :locals => { :post => false }
-end
-
-### Create an application for the admin to approve
-post '/register' do
-  add_application(params)
-  erb :register, :locals => { :post => true }
-end
+  ### Create an application for the admin to approve
+  post '/register' do
+    add_application(params)
+    erb :register, :locals => { :post => true }
+  end
 
