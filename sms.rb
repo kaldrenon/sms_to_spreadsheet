@@ -67,7 +67,7 @@ def performAction(command)
   when "BALANCE" then balance
   when "HELP" then help
   when "REGISTER" then register(command)
-  else unknownCommand(command)
+  else unknownCommand
   end
 end
 
@@ -150,12 +150,12 @@ def balance
 end
 
 ### Let user know their request wasn't understood.
-def unknownCommand(command)
+def unknownCommand
   @t.say("Sorry, I couldn't understand your message. Please use following syntax: [command] [arguments]\nText HELP for available commands")
 end
 
 ### Show user a help message
-def help(command)
+def help
   @t.say("The available commands are: BUY, SELL, RECENT, BALANCE")
 end
 
