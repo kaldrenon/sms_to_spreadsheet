@@ -45,7 +45,7 @@ end
 
 # Currently - command: 0 = keyword, 1 = item, 2 = value. For recent, 1 = qty
 # TODO: Make this more robust for commands of varying length
-def performAction(command, ledger)
+def performAction(command)
   command = command.strip.split(/ *, */)
   # Force upper case for the command word
   command[0] = command[0].upcase
