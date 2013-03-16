@@ -189,8 +189,7 @@ def build_csv
   body = [ledger['title']]
 
   entries.each do |entry|
-    body.push("#{entry['action']},#{entry['description']},
-               #{entry['value']},#{entry'timestamp']}")
+    body.push("#{entry['action']},#{entry['description']},#{entry['value']},#{entry['timestamp']}")
   end
 
   return body
