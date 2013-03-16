@@ -182,8 +182,8 @@ def add_application(params)
   #TODO: Email admin about a new request
 end
 
-def build_csv
-  ledger = @@ledgers.find("owner" => @sender).first
+def build_csv(number)
+  ledger = @@ledgers.find("owner" => number).first
   entries = ledger['entries']
 
   body = [ledger['title']]
@@ -218,7 +218,7 @@ post '/email' do
     if(sender_info['email'] == email)
       attachment = "#{ledger_name}.csv"
 
-      csv_body = build_csv
+      csv_body = build_csv(number)
 
       Pony.mail(
         :to => "#{sender_info['name']} <#{email}>",
