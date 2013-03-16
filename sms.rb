@@ -10,6 +10,7 @@ require 'mongo'
 include Mongo
 
 c = JSON.parse(File.open("config.json","r").read)
+@@admin = c['admin']
 ENV['MONGODB_URI'] = c['db']['uri']
 @@mongo = MongoClient.new
 # These are documents in the Mongo DB
@@ -190,7 +191,7 @@ def add_application(params)
 
   #TODO: Email admin about a new request
   Pony.mail(
-    :to => c['admin'],
+    :to => @@admin,
     :from => "csv_sender@pcsms.herokuapp.com",
     :subject => "New Applicant on PCSMS - #{name}",
     :html_body => "<a href=\"http://pcsms.herokuapp.com\">Click here!</a>"
