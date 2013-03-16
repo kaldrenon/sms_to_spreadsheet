@@ -75,7 +75,7 @@ def buy(command)
   description = "Bought"
   action = command[1]
   value = command[2]
-  timestamp = Time.now
+  timestamp = Time.now.to_s
   @t.say("Got your purchase: #{action}, #{description}, #{value}")
   
   # TODO: Update correct ledger document
