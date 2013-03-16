@@ -212,6 +212,8 @@ post '/email' do
 
   post = false
   sender_info = @@white.find("number" => @sender)
+  puts sender_info.class
+  puts sender_info.count
   if(sender_info.count == 1)
     sender_info = sender_info.first
     ledger_name = @@ledgers.find("owner" => sender_info['number']).first['title']
