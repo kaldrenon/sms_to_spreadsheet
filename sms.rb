@@ -190,7 +190,7 @@ def add_application(params)
 
   #TODO: Email admin about a new request
   Pony.mail(
-    :to => c['admin']
+    :to => c['admin'],
     :from => "csv_sender@pcsms.herokuapp.com",
     :subject => "New Applicant on PCSMS - #{name}",
     :html_body => "<a href=\"http://pcsms.herokuapp.com\">Click here!</a>"
