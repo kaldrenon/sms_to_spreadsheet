@@ -239,6 +239,8 @@ post '/email' do
     else
       return "<h3>failed</h3>"
     end
+  else
+    return "<h3>failed worse</h3>"
   end
 
 end
