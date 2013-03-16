@@ -192,7 +192,7 @@ def build_csv(number)
     body.push("#{entry['action']},#{entry['description']},#{entry['value']},#{entry['timestamp']}")
   end
 
-  return body
+  return body.join("\n")
 end
 
 ### Show an index page (explains the purpose of the app)
@@ -235,7 +235,6 @@ post '/email' do
 
       Pony.mail(
         :to => "#{sender_info['name']} <#{email}>",
-        :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
         :subject => sender_info['name'] + ", here is the email you requested from S2S.",
         :html_body => "See attachment.",
         :attachments => {File.basename("#{attachment}") => csv_body}
