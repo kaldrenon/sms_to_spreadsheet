@@ -220,6 +220,18 @@ post '/email' do
 
       csv_body = build_csv(number)
 
+      Pony.options = {
+        :via => :smtp,
+        :via_options => {
+        :address => 'smtp.sendgrid.net',
+        :port => '587',
+        :domain => 'heroku.com',
+        :user_name => ENV['SENDGRID_USERNAME'],
+        :password => ENV['SENDGRID_PASSWORD'],
+        :authentication => :plain,
+        :enable_starttls_auto => true
+      }
+
       Pony.mail(
         :to => "#{sender_info['name']} <#{email}>",
         :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
@@ -228,7 +240,7 @@ post '/email' do
         :attachments => {File.basename("#{attachment}") => csv_body}
       )
       post = true
-      
+
       erb :email_request, :locals => {
         :sent => true, 
         :post => post, 
