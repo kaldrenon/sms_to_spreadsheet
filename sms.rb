@@ -228,18 +228,19 @@ post '/email' do
         :attachments => {File.basename("#{attachment}") => csv_body}
       )
       post = true
+      
+      return erb :email_request, :locals => {
+        :sent => true, 
+        :post => post, 
+        :number => number, 
+        :email => email,
+        :name => sender_info['name']
+      }
     else
       #TODO: respond to mismatch in number and email
     end
   end
 
-  erb :email_request, :locals => {
-    :sent => true, 
-    :post => post, 
-    :number => number, 
-    :email => email,
-    :name => sender_info['name']
-  }
 end
 
 ### Show a form for registering in the system
