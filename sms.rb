@@ -79,7 +79,10 @@ def buy(command)
   @t.say("Got your purchase: #{action}, #{description}, #{value}")
   
   # TODO: Update correct ledger document
-  @@mongo['pcsms']['ledgers'](
+  
+  # TODO: Check if ledger exists first
+
+  @@mongo['pcsms']['ledgers'].update(
     {"owner" => @sender}, 
     { "$push" => 
       { "entries" => 
