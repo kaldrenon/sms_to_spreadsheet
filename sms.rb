@@ -229,7 +229,7 @@ post '/email' do
       )
       post = true
       
-      return erb :email_request, :locals => {
+      erb :email_request, :locals => {
         :sent => true, 
         :post => post, 
         :number => number, 
@@ -237,7 +237,7 @@ post '/email' do
         :name => sender_info['name']
       }
     else
-      #TODO: respond to mismatch in number and email
+      return "<h3>failed</h3>"
     end
   end
 
