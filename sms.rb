@@ -64,8 +64,8 @@ def performAction(command)
   when "SELL" then sell(command)
   when "RECENT" then recent()
   when "PAST" then recent()
-  when "BALANCE" then balance(command)
-  when "HELP" then help(command)
+  when "BALANCE" then balance
+  when "HELP" then help
   when "REGISTER" then register(command)
   else unknownCommand(command)
   end
@@ -75,7 +75,7 @@ end
 def buy(command)
   action = "Bought"
   description = command[1]
-  value = command[2]
+  value = "(#{command[2]})"
   timestamp = Time.now.to_s
   @t.say("Got your purchase: #{action}, #{description}, #{value}")
   
@@ -131,19 +131,17 @@ def recent
 end
 
 ### Calculate the balance based on sum/difference of all ledger entries
-def balance(command)
-  valuesArray = []
-  lines = File.open("out.csv", "r").readlines.each do |line|
-    line = line.split(/ *, */)
-    valuesArray.push(line[2])
-  end
+def balance
+  entries = @@ledgers.find("owner" => @sender).first['entries']
+
   sum = 0
-  valuesArray.each do |value|
-    if value[0] == '('
-      value = value[2..-2]
+  entries.each do |entry|
+    value = entry['value'].gsub("$","")
+
+    if entry['value'][0] == '('
+      value = value[1..-2]
       sum = sum - value.to_i
     else
-      value = value[1..-1]
       sum = sum + value.to_i
     end
   end
