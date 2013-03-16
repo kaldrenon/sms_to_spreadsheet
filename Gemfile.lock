@@ -8,6 +8,7 @@ GEM
     eventmachine (1.0.0)
     hashie (2.0.0)
     i18n (0.6.1)
+    json (1.7.7)
     json_pure (1.7.7)
     mail (2.5.3)
       i18n (>= 0.4.0)
@@ -43,6 +44,7 @@ PLATFORMS
 
 DEPENDENCIES
   bson_ext
+  json
   mongo
   pony
   sinatra

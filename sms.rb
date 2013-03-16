@@ -1,5 +1,6 @@
 #RHoK 
 require 'sinatra'
+require 'json'
 require 'rubygems'
 require 'tropo-webapi-ruby'
 require 'pony'
@@ -70,19 +71,32 @@ def performAction(command)
   end
 end
 
-### Add record of a buy to the CSV
+### Add record of a buy to the ledger
 def buy(command)
-  description = "Bought"
-  action = command[1]
+  action = "Bought"
+  description = command[1]
   value = command[2]
   timestamp = Time.now.to_s
   @t.say("Got your purchase: #{action}, #{description}, #{value}")
   
-  # TODO: Update correct ledger document
+  ledger_push(action, value, description, timestamp)
   
-  # TODO: Check if ledger exists first
+end
 
-  @@mongo['pcsms']['ledgers'].update(
+### Add record of a sale to the ledger
+def sell(command)
+  action = "Sold"
+  description = command[1]
+  value = command[2]
+  timestamp = Time.now.to_s
+  @t.say("Got your sale: #{action}, #{description}, #{value}")
+  
+  ledger_push(action, value, description, timestamp)
+end
+
+def ledger_push(action, value, description, timestamp)
+  # TODO: Check if ledger exists first
+  @@ledgers.update(
     {"owner" => @sender}, 
     { "$push" => 
       { "entries" => 
@@ -95,22 +109,11 @@ def buy(command)
       }
     }
   )
-
-
-  #File.open("out.csv", "a") {|f| f.write(line)}
-end
-
-### Add record of a sale to the CSV
-def sell(command)
-  line = "Sold, #{command[1]}, #{command[2]}"
-  @t.say("Got your sale: #{line}")
-  line = line + ", #{Time.now}\n"
-  # TODO: Update correct ledger document
-  #File.open("out.csv", "a") {|f| f.write(line)}
 end
 
 ### Show the user the N most recent transactions
 def recent(command)
+  # TODO: Replace file operations with db operations
   lines = File.open("out.csv", "r").readlines
   if (lines.length > command[1].to_i)
     lines = lines[-command[1].to_i..-1]
