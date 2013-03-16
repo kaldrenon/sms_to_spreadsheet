@@ -17,6 +17,19 @@ ENV['MONGODB_URI'] = c['db']['uri']
 @@white = @@mongo['pcsms']['whitelist']
 @@ledgers = @@mongo['pcsms']['ledgers']
 
+Pony.options = {
+  :via => :smtp,
+  :via_options => {
+    :address => 'smtp.sendgrid.net',
+    :port => '587',
+    :domain => 'heroku.com',
+    :user_name => ENV['SENDGRID_USERNAME'],
+    :password => ENV['SENDGRID_PASSWORD'],
+    :authentication => :plain,
+    :enable_starttls_auto => true
+  }
+}
+
 use Rack::Session::Pool
 
 post '/index.json' do
@@ -175,18 +188,22 @@ def add_application(params)
   json[number] = {"name" => name, "email" => email}
 
   # TODO: Update Mongo applications document
-  #File.open("applications.json","w") do |f|
-  #  f.write(JSON.pretty_generate(json))
-  #end
+  @@apps.insert({"name" => name, "email" => email, "number" => number})
 
   #TODO: Email admin about a new request
+  Pony.mail(
+    :to => c['admin']
+    :from => "csv_sender@pcsms.herokuapp.com",
+    :subject => "New Applicant on PCSMS - #{name}",
+    :html_body => '<a href="http://pcsms.herokuapp.com">Click here!</a>'
+  )
 end
 
 def build_csv(number)
   ledger = @@ledgers.find("owner" => number).first
   entries = ledger['entries']
 
-  body = [ledger['title']]
+  body = [ledger['title'], "", "Action,Description,Value,Time"]
 
   entries.each do |entry|
     body.push("#{entry['action']},#{entry['description']},#{entry['value']},#{entry['timestamp']}")
@@ -220,18 +237,6 @@ post '/email' do
 
       csv_body = build_csv(number)
 
-      Pony.options = {
-        :via => :smtp,
-        :via_options => {
-          :address => 'smtp.sendgrid.net',
-          :port => '587',
-          :domain => 'heroku.com',
-          :user_name => ENV['SENDGRID_USERNAME'],
-          :password => ENV['SENDGRID_PASSWORD'],
-          :authentication => :plain,
-          :enable_starttls_auto => true
-        }
-      }
 
       Pony.mail(
         :to => "#{sender_info['name']} <#{email}>",
