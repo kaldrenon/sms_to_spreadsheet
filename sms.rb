@@ -238,7 +238,7 @@ post '/email' do
     :post => post, 
     :number => number, 
     :email => email,
-    :name => @whitelist[number]["name"]
+    :name => sender_info['name']
   }
 end
 
