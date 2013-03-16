@@ -222,9 +222,9 @@ post '/email' do
       csv_body = build_csv
 
       Pony.mail(
-        :to => "#{@whitelist[number]["name"]} <#{email}>",
+        :to => "#{sender_info['name']} <#{email}>",
         :from => 'SMS to Spreadsheet <s2s@kaldrenon.com>',
-        :subject => @whitelist[number]["name"] + ", here is the email you requested from S2S.",
+        :subject => sender_info['name'] + ", here is the email you requested from S2S.",
         :html_body => "See attachment.",
         :attachments => {File.basename("#{attachment}") => csv_body}
       )
