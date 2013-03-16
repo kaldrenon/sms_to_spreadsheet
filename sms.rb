@@ -27,21 +27,18 @@ post '/index.json' do
   @sender = @v[:session][:from][:id]
   @message_text = @v[:session][:initial_text]
 
-  # Initialize important instance variables
-  # sender number (the unique identifier)
-
   # Check for sender number in whitelist
   if (@@white.find("number" => @sender))
     # Find this user's ledger.
     @ledger = @@white.find("number" => @sender).first['ledger']
 
-    performAction(@message_text, @ledger)
+    performAction(@message_text)
   else
     @t.say("Your number is not recognized in our approved list.")
   end
 
   # Write the message to a document in mongo
-  @@mongo['pcsms']['message_dump'].insert("message" => @message_text)
+  @@mongo['pcsms']['message_dump'].insert({"message" => @message_text, "sender" => @sender})
 
   return @t.response
 end
@@ -75,10 +72,28 @@ end
 
 ### Add record of a buy to the CSV
 def buy(command)
-  line = "Bought, #{command[1]}, (#{command[2]})"
-  @t.say("Got your purchase: #{line}")
-  line = line + ", #{Time.now}\n"
+  description = "Bought"
+  action = command[1]
+  value = command[2]
+  timestamp = Time.now
+  @t.say("Got your purchase: #{action}, #{description}, #{value}")
+  
   # TODO: Update correct ledger document
+  @@mongo['pcsms']['ledgers'](
+    {"owner" => @sender}, 
+    { "$push" => 
+      { "entries" => 
+        {
+          "action" => action, 
+          "value" => value, 
+          "description" => description, 
+          "timestamp" => timestamp
+        } 
+      }
+    }
+  )
+
+
   #File.open("out.csv", "a") {|f| f.write(line)}
 end
 
