@@ -235,6 +235,7 @@ post '/email' do
 
       Pony.mail(
         :to => "#{sender_info['name']} <#{email}>",
+        :from => "csv_sender@pcsms.herokuapp.com",
         :subject => sender_info['name'] + ", here is the email you requested from S2S.",
         :html_body => "See attachment.",
         :attachments => {File.basename("#{attachment}") => csv_body}
