@@ -211,7 +211,7 @@ post '/email' do
   email = params[:email]
 
   post = false
-  sender_info = @@white.find("number" => @sender)
+  sender_info = @@white.find("number" => number)
   if(sender_info.count > 0)
     sender_info = sender_info.first
     ledger_name = @@ledgers.find("owner" => sender_info['number']).first['title']
@@ -240,7 +240,7 @@ post '/email' do
       return "<h3>failed</h3>"
     end
   else
-    return "#{@@white.find("number" => @sender).to_s}"
+    return "#{@@white.find("number" => number).to_s}"
   end
 
 end
