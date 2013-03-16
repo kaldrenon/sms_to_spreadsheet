@@ -120,7 +120,7 @@ def recent
     num_recent = entries.length
   end
 
-  reply = []
+  reply = ["Most recent ledger entries:"]
   
   for n in 1..num_recent
     entry = entries[-n]
