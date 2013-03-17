@@ -273,3 +273,15 @@ post '/register' do
   erb :register, :locals => { :post => true }
 end
 
+get '/admin' do
+  erb :admin
+end
+
+post '/admin_panel' do
+  admin_pw = @@mongo['pcsms']['admin'].find("context" => "dev").first["pw"]
+  puts params[:pw]
+  if params[:pw] == admin_pw
+    "<h3>Logged in!</h3>"
+  end
+end
+

@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Approve Requests</title>
+    <link type="text/css" href="/css/style.css" rel="stylesheet"/>
+    <script src="/js/jquery.js"></script>
+    <script src="/js/less.js"></script>
+    <script src="/js/master.js"></script>
+  </head>
+  <body>
+    <div id="floater">
+      <div id="login" class="mainbody">
+        Password: <input type="text" id="password" />
+      </div>
+      <div hidden id="admin_panel" class="mainbody">
+
+      </div>
+
+    </div>
+  </body>
+</html>
+
+<script>
+  $("#password").change(function(){
+    if($("#password").val() == "test"){
+      $.post("/admin_panel", { "pw" : $("#password").val() }, function(result){
+        $("#admin_panel").html(result);
+        $("#login").hide();
+        $("#admin_panel").show('slow');
+      });
+    }
+  });
+</script>
