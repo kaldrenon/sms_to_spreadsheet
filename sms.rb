@@ -281,7 +281,8 @@ post '/admin_panel' do
   admin_pw = @@mongo['pcsms']['admin'].find("context" => "dev").first["pw"]
   puts params[:pw]
   if params[:pw] == admin_pw
-    "<h3>Logged in!</h3>"
+    applicants = @@apps.find().to_a
+    erb :admin_panel, :locals => { :applicants => applicants }
   else
     "badpw"
   end

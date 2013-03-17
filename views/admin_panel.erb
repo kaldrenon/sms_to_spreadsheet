@@ -1,0 +1,37 @@
+<h3>Admin</h3>
+
+<% for a in applicants %>
+  <div class="admin_row">
+    <table>
+      <tr>
+        <td style="text-align: left;">
+          <p><%= a['name'] %></p>
+        </td>
+        <td>
+          <p><%= a['number'] %></p>
+        </td>
+        <td>
+          <p><%= a['email'] %></p>
+        </td>
+        <td>
+          <p><%= a['ledger'] %></p>
+        </td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<style>
+  div.admin_row {
+    border: 1px solid black;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  div.admin_row:hover {
+    background-color: #ffa;
+  }
+  p {
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+</style>
