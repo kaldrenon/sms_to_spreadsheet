@@ -282,6 +282,8 @@ post '/admin_panel' do
   puts params[:pw]
   if params[:pw] == admin_pw
     "<h3>Logged in!</h3>"
+  else
+    "badpw"
   end
 end
 

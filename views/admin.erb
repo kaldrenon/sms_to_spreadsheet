@@ -1,4 +1,12 @@
 <html>
+  <style>
+    a#submit {
+      border: 1px solid white;
+      background-color: #001234;
+      color: white;
+      padding: 5px;
+    }
+  </style>
   <head>
     <title>Approve Requests</title>
     <link type="text/css" href="/css/style.css" rel="stylesheet"/>
@@ -9,7 +17,8 @@
   <body>
     <div id="floater">
       <div id="login" class="mainbody">
-        Password: <input type="text" id="password" />
+        Password: <input type="password" id="password" />
+        <a href="#" id="submit">Submit</a>
       </div>
       <div hidden id="admin_panel" class="mainbody">
 
@@ -20,13 +29,16 @@
 </html>
 
 <script>
-  $("#password").change(function(){
-    if($("#password").val() == "test"){
-      $.post("/admin_panel", { "pw" : $("#password").val() }, function(result){
+  $("#submit").click(function(){
+    $.post("/admin_panel", { "pw" : $("#password").val() }, function(result){
+      if(result == "badpw"){
+        alert("bad password");
+      }
+      else{
         $("#admin_panel").html(result);
         $("#login").hide();
         $("#admin_panel").show('slow');
-      });
-    }
+      }
+    });
   });
 </script>
