@@ -1,37 +1,31 @@
-<h3>Admin</h3>
 
-<% for a in applicants %>
-  <div class="admin_row">
-    <table>
-      <tr>
-        <td style="text-align: left;">
-          <p><%= a['name'] %></p>
-        </td>
-        <td>
-          <p><%= a['number'] %></p>
-        </td>
-        <td>
-          <p><%= a['email'] %></p>
-        </td>
-        <td>
-          <p><%= a['ledger'] %></p>
-        </td>
-      </tr>
-    </table>
-  </div>
-<% end %>
-
-<style>
-  div.admin_row {
-    border: 1px solid black;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-  div.admin_row:hover {
-    background-color: #ffa;
-  }
-  p {
-    padding-right: 2px;
-    padding-left: 2px;
-  }
-</style>
+<table class="admin_tbl">
+  <thead class="admin_thead">
+    <th>Name</th>
+    <th>Number</th>
+    <th>Email</th>
+    <th>Ledger</th>
+    <th></th>
+  </thead>
+  <% n = 1 %>
+  <% for a in applicants %>
+    <tr class="admin_row <%= if(n.even?); "even_row"; else; "odd_row"; end %>">
+      <td>
+        <%= a['name'] %>
+      </td>
+      <td>
+        <%= a['number'] %>
+      </td>
+      <td>
+        <%= a['email'] %>
+      </td>
+      <td>
+        <%= a['ledger'] %>
+      </td>
+      <td>
+        <a href="#" id="approve">&#x2713;</a>
+        <a href="#" id="deny">x</a>
+      </td>
+    </tr>
+  <% end %>
+</table>

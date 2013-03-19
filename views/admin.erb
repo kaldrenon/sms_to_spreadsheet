@@ -1,21 +1,6 @@
+<!DOCTYPE html>
 <html>
-  <style>
-    a#submit {
-      border: 1px solid white;
-      background-color: #001234;
-      color: white;
-      padding: 5px;
-    }
-    .admin_row {
-      border: 1px solid black;
-      border-top-right-radius: 2px;   
-      border-top-left-radius: 2px;    
-      border-bottom-right-radius: 2px;
-      border-bottom-left-radius: 2px; 
-      padding: 10px;
-    }
-  </style>
-  <head>
+  <head lang="en" xml:lang="en">
     <title>Approve Requests</title>
     <link type="text/css" href="/css/style.css" rel="stylesheet"/>
     <script src="/js/jquery.js"></script>
@@ -24,32 +9,32 @@
   </head>
   <body>
     <div id="floater">
-      <div id="login" class="mainbody">
-        Password: <input type="password" id="password" />
-        <a href="#" id="submit">Submit</a>
+      <div class="mainbody">
+        <h3 class="pagetitle">Admin</h3>
+        <div id="login" style="text-align: center;">
+          Password: <input type="password" id="password" />
+          <a href="#" id="submit">Submit</a>
+        </div>
       </div>
-      <div hidden id="admin_panel" class="mainbody">
-
-      </div>
-
+      <div hidden id="admin_panel" class="mainbody"> </div>
     </div>
+
+    <script>
+      $(document).ready(function(){
+        $("#password").focus();
+      });
+      $("#submit").click(function(){
+        $.post("/admin_panel", { "pw" : $("#password").val() }, function(result){
+          if(result == "badpw"){
+            alert("bad password");
+          }
+          else{
+            $("#admin_panel").html(result);
+            $("#login").hide();
+            $("#admin_panel").show('slow');
+          }
+        });
+      });
+    </script>
   </body>
 </html>
-
-<script>
-  $(document).ready(function(){
-    $("#password").focus();
-  });
-  $("#submit").click(function(){
-    $.post("/admin_panel", { "pw" : $("#password").val() }, function(result){
-      if(result == "badpw"){
-        alert("bad password");
-      }
-      else{
-        $("#admin_panel").html(result);
-        $("#login").hide();
-        $("#admin_panel").show('slow');
-      }
-    });
-  });
-</script>
